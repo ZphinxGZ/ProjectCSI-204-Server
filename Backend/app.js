@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import connectDB from './config/DB.js';
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(morgan('dev')); // Log all requests
 
 // Routes
 app.use('/api', userRoutes);
+app.use('/api', authRoutes);
 
 // Start the server
 const PORT = 3001;
