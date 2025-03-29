@@ -9,6 +9,6 @@ const userSchema = new mongoose.Schema({
   department: { type: String }, // แผนกที่ผู้ใช้งานสังกัด
   is_active: { type: Boolean, default: true }, // สถานะการใช้งานของผู้ใช้งาน
   created_at: { type: Date, default: Date.now } // วันที่และเวลาที่สร้างข้อมูลผู้ใช้งาน
-});
+}, { collection: 'Users' }); // Explicitly set the collection name to 'Users'
 
 export default mongoose.model('User', userSchema);
