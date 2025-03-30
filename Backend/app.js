@@ -5,6 +5,7 @@ import connectDB from './config/DB.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import purchaseRequisitionRoutes from './routes/purchaseRequisitionRoutes.js';
+import vendorRoutes from './routes/vendorRoutes.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api', userRoutes);
 app.use('/api', authRoutes);
 app.use('/api', purchaseRequisitionRoutes);
+app.use('/api', vendorRoutes);
 
 // Start the server
 const PORT = 3001;
