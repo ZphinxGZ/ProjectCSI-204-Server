@@ -1,0 +1,138 @@
+import PurchaseOrder from '../models/PurchaseOrder.js';
+import Vendor from '../models/Vendor.js';
+import PurchaseRequisition from '../models/PurchaseRequisition.js';
+
+export const createPurchaseOrder = async (req, res) => {
+  try {
+    const {
+      po_number,
+      pr_id,
+      vendor_id,
+      issue_date,
+      expected_delivery_date,
+      payment_terms,
+      subtotal,
+      tax,
+      total_amount,
+      notes,
+    } = req.body;
+
+    // Validate required fields
+    if (!po_number || !pr_id || !vendor_id || !issue_date || !subtotal || !total_amount) {
+      return res.status(400).json({ message: 'Required fields are missing.' });
+    }
+
+    // Check if PO number already exists
+    const existingPO = await PurchaseOrder.findOne({ po_number });
+    if (existingPO) {
+      return res.status(400).json({ message: 'PO number already exists.' });
+    }
+
+    // Check if the vendor exists
+    const vendor = await Vendor.findById(vendor_id);
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found.' });
+    }
+
+    // Check if the purchase requisition exists
+    const purchaseRequisition = await PurchaseRequisition.findById(pr_id);
+    if (!purchaseRequisition) {
+      return res.status(404).json({ message: 'Purchase requisition not found.' });
+    }
+
+    // Create a new purchase order
+    const newPO = await PurchaseOrder.create({
+      po_number,
+      pr_id,
+      vendor_id,
+      issuer_id: req.user._id,
+      issue_date,
+      expected_delivery_date,
+      payment_terms,
+      subtotal,
+      tax,
+      total_amount,
+      notes,
+    });
+
+    res.status(201).json({ message: 'Purchase order created successfully.', purchaseOrder: newPO });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+export const getPurchaseOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the purchase order by ID and populate related fields
+    const purchaseOrder = await PurchaseOrder.findById(id)
+      .populate('pr_id', 'pr_number department status') // Populate purchase requisition details
+      .populate('vendor_id', 'vendor_name contact_person phone email') // Populate vendor details
+      .populate('issuer_id', 'full_name email'); // Populate issuer details
+
+    if (!purchaseOrder) {
+      return res.status(404).json({ message: 'Purchase order not found.' });
+    }
+
+    res.status(200).json({ message: 'Purchase order fetched successfully.', purchaseOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+export const approvePurchaseOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the purchase order by ID
+    const purchaseOrder = await PurchaseOrder.findById(id);
+    if (!purchaseOrder) {
+      return res.status(404).json({ message: 'Purchase order not found.' });
+    }
+
+    // Check if the purchase order is already approved
+    if (purchaseOrder.status === 'Approved') {
+      return res.status(400).json({ message: 'Purchase order is already approved.' });
+    }
+
+    // Update the status to "Approved" and set the approver details
+    purchaseOrder.status = 'Approved';
+    purchaseOrder.approved_by = req.user._id;
+    purchaseOrder.approved_at = new Date();
+
+    await purchaseOrder.save();
+
+    res.status(200).json({ message: 'Purchase order approved successfully.', purchaseOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+export const cancelPurchaseOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the purchase order by ID
+    const purchaseOrder = await PurchaseOrder.findById(id);
+    if (!purchaseOrder) {
+      return res.status(404).json({ message: 'Purchase order not found.' });
+    }
+
+    // Check if the purchase order is already canceled
+    if (purchaseOrder.status === 'Cancelled') {
+      return res.status(400).json({ message: 'Purchase order is already canceled.' });
+    }
+
+    // Update the status to "Cancelled"
+    purchaseOrder.status = 'Cancelled';
+    purchaseOrder.cancelled_by = req.user._id;
+    purchaseOrder.cancelled_at = new Date();
+
+    await purchaseOrder.save();
+
+    res.status(200).json({ message: 'Purchase order canceled successfully.', purchaseOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
