@@ -12,6 +12,7 @@ const purchaseRequisitionSchema = new mongoose.Schema({
   notes: { type: String }, // หมายเหตุเพิ่มเติม
   approved_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // ผู้ใช้งานที่อนุมัติคำขอซื้อ
   approved_at: { type: Date }, // วันที่และเวลาที่อนุมัติคำขอซื้อ
+  attachments: [{ type: String }], // Paths to uploaded attachments
   created_at: { type: Date, default: Date.now } // วันที่และเวลาที่สร้างคำขอซื้อ
 });
 

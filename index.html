@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download File</title>
+</head>
+<body>
+    <button id="downloadBtn">Download</button>
+    
+    <script>
+        document.getElementById("downloadBtn").addEventListener("click", async function() {
+            const url = "http://localhost:3001/api/purchase-requisitions/67e989d301b1b2ff97012001/attachments/1743362774107_Microsoft Learnning - 66075063.pdf";
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTk4YTY2MDFiMWIyZmY5NzAxMjAwNSIsInJvbGUiOiJQcm9jdXJlbWVudCIsImlhdCI6MTc0MzM1OTcxNiwiZXhwIjoxNzQzNDQ2MTE2fQ.ZtI11LjV6yP2N_yZNEIcpESWT4JJmBJH3T-SWckz5xE";
+            
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Failed to download file");
+                }
+                
+                const blob = await response.blob();
+                const link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "downloaded_file"; // ตั้งชื่อไฟล์ที่ดาวน์โหลด
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                console.error("Download error:", error);
+            }
+        });
+    </script>
+</body>
+</html>
