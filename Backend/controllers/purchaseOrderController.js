@@ -1,6 +1,8 @@
 import PurchaseOrder from '../models/PurchaseOrder.js';
 import Vendor from '../models/Vendor.js';
 import PurchaseRequisition from '../models/PurchaseRequisition.js';
+import fs from 'fs';
+import path from 'path';
 
 export const createPurchaseOrder = async (req, res) => {
   try {
@@ -132,6 +134,75 @@ export const cancelPurchaseOrder = async (req, res) => {
     await purchaseOrder.save();
 
     res.status(200).json({ message: 'Purchase order canceled successfully.', purchaseOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+export const uploadPurchaseOrderAttachment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if a file is uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded.' });
+    }
+
+    // Find the purchase order by ID
+    const purchaseOrder = await PurchaseOrder.findById(id);
+    if (!purchaseOrder) {
+      return res.status(404).json({ message: 'Purchase order not found.' });
+    }
+
+    // Generate a unique filename by appending the current timestamp
+    const timestamp = Date.now();
+    const originalFilename = req.file.originalname;
+    const uniqueFilename = `${timestamp}_${originalFilename}`;
+
+    // Move the file to the uploads directory with the unique filename
+    const newPath = path.join('uploads', uniqueFilename);
+    fs.renameSync(req.file.path, newPath);
+
+    // Save the unique filename to the purchase order
+    purchaseOrder.attachments = purchaseOrder.attachments || [];
+    purchaseOrder.attachments.push(uniqueFilename);
+    await purchaseOrder.save();
+
+    res.status(200).json({
+      message: 'Attachment uploaded successfully.',
+      attachments: purchaseOrder.attachments,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+export const downloadPurchaseOrderAttachment = async (req, res) => {
+  try {
+    const { id, filename } = req.params;
+
+    // Find the purchase order by ID
+    const purchaseOrder = await PurchaseOrder.findById(id);
+    if (!purchaseOrder) {
+      return res.status(404).json({ message: 'Purchase order not found.' });
+    }
+
+    // Check if the file exists in the attachments
+    const fileExistsInDB = purchaseOrder.attachments.includes(filename);
+    if (!fileExistsInDB) {
+      return res.status(404).json({ message: 'File not found in attachments.' });
+    }
+
+    // Construct the full file path
+    const filePath = path.join('uploads', filename);
+
+    // Check if the file exists on the server
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found on server.' });
+    }
+
+    // Send the file to the client
+    res.download(filePath, filename);
   } catch (error) {
     res.status(500).json({ message: 'Server error.', error: error.message });
   }

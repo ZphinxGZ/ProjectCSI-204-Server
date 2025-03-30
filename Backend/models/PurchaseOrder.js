@@ -17,6 +17,7 @@ const purchaseOrderSchema = new mongoose.Schema({
   tax: { type: Number, default: 0 }, // จำนวนภาษี
   total_amount: { type: Number }, // ยอดรวมทั้งหมด
   notes: { type: String }, // หมายเหตุเพิ่มเติม
+  attachments: [{ type: String }], // Paths to uploaded attachments
   created_at: { type: Date, default: Date.now } // วันที่และเวลาที่สร้างใบสั่งซื้อ
 });
 
