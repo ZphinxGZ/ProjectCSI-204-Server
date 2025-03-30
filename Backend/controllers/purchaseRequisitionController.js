@@ -1,16 +1,37 @@
 import PurchaseRequisition from '../models/PurchaseRequisition.js';
+import PRItem from '../models/PRItem.js';
 import path from 'path';
 import fs from 'fs';
 
 // Create a new purchase requisition
 export const createPurchaseRequisition = async (req, res) => {
   try {
-    const { pr_number, department, budget_id, request_date, required_date, total_amount, notes } = req.body;
+    const {
+      pr_number,
+      department,
+      budget_id,
+      request_date,
+      required_date,
+      notes,
+      item_type,
+      description,
+      quantity,
+      unit,
+      estimated_price,
+    } = req.body;
 
-    // Validate required fields
-    if (!pr_number || !department || !request_date || !total_amount) {
+    // Validate required fields for Purchase Requisition
+    if (!pr_number || !department || !request_date) {
       return res.status(400).json({ message: 'Required fields are missing.' });
     }
+
+    // Validate required fields for PRItem
+    if (!item_type || !description || !quantity || !unit || !estimated_price) {
+      return res.status(400).json({ message: 'Required item fields are missing.' });
+    }
+
+    // Calculate total_amount dynamically
+    const total_amount = quantity * estimated_price;
 
     // Check if PR number already exists
     const existingPR = await PurchaseRequisition.findOne({ pr_number });
@@ -18,7 +39,7 @@ export const createPurchaseRequisition = async (req, res) => {
       return res.status(400).json({ message: 'PR number already exists.' });
     }
 
-    // Create a new purchase requisition in the correct collection
+    // Create a new purchase requisition
     const newPR = new PurchaseRequisition({
       pr_number,
       requester_id: req.user._id,
@@ -32,7 +53,25 @@ export const createPurchaseRequisition = async (req, res) => {
 
     await newPR.save();
 
-    res.status(201).json({ message: 'Purchase requisition created successfully.', purchaseRequisition: newPR });
+    // Create a new PRItem linked to the purchase requisition
+    const newPRItem = new PRItem({
+      pr_id: newPR._id,
+      item_type,
+      description,
+      quantity,
+      unit,
+      estimated_price,
+      total_price: total_amount,
+      notes,
+    });
+
+    await newPRItem.save();
+
+    res.status(201).json({
+      message: 'Purchase requisition and item created successfully.',
+      purchaseRequisition: newPR,
+      prItem: newPRItem,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error.', error: error.message });
   }
