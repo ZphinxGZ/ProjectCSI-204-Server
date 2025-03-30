@@ -7,12 +7,15 @@ const purchaseOrderSchema = new mongoose.Schema({
   issuer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // ผู้ใช้งานที่ออกใบสั่งซื้อ
   issue_date: { type: Date, required: true }, // วันที่ออกใบสั่งซื้อ
   expected_delivery_date: { type: Date }, // วันที่คาดว่าจะได้รับสินค้า/บริการ
-  status: { type: String, enum: ['Draft', 'Sent', 'Partially Received', 'Completed', 'Cancelled'], default: 'Draft' }, // สถานะของใบสั่งซื้อ
+  status: { type: String, enum: ['Draft', 'Sent', 'Partially Received', 'Completed', 'Cancelled', 'Approved'], default: 'Draft' }, // สถานะของใบสั่งซื้อ
   payment_terms: { type: String }, // เงื่อนไขการชำระเงิน
   subtotal: { type: Number, required: true }, // ยอดรวมก่อนภาษี
   tax: { type: Number, default: 0 }, // จำนวนภาษี
   total_amount: { type: Number }, // ยอดรวมทั้งหมด
   notes: { type: String }, // หมายเหตุเพิ่มเติม
+  attachments: [{ type: String }], // Paths to uploaded attachments
+  approved_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // ผู้ใช้งานที่อนุมัติใบสั่งซื้อ
+  approved_at: { type: Date }, // วันที่และเวลาที่อนุมัติใบสั่งซื้อ
   created_at: { type: Date, default: Date.now } // วันที่และเวลาที่สร้างใบสั่งซื้อ
 });
 
