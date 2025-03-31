@@ -6,11 +6,6 @@ import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import purchaseRequisitionRoutes from './routes/purchaseRequisitionRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
-import purchaseOrderRoutes from './routes/purchaseOrderRoutes.js';
-import assetReceivingRoutes from './routes/assetReceivingRoutes.js';
-import inventoryRoutes from './routes/inventoryRoutes.js';
-import accountsPayableRoutes from './routes/accountsPayableRoutes.js';
-import reportRoutes from './routes/reportRoutes.js';
 
 const app = express();
 
@@ -30,11 +25,6 @@ app.use('/api', userRoutes);
 app.use('/api', authRoutes);
 app.use('/api', purchaseRequisitionRoutes);
 app.use('/api', vendorRoutes);
-app.use('/api', purchaseOrderRoutes);
-app.use('/api', assetReceivingRoutes);
-app.use('/api', inventoryRoutes);
-app.use('/api', accountsPayableRoutes);
-app.use('/api', reportRoutes);
 
 // Start the server
 const PORT = 3001;

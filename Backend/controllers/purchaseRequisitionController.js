@@ -18,27 +18,26 @@ export const createPurchaseRequisition = async (req, res) => {
       quantity,
       unit,
       estimated_price,
-      total_price,
     } = req.body;
 
     // Validate required fields for Purchase Requisition
     if (!pr_number || !department || !request_date) {
-      return res.status(400).json({ message: 'Required fields for purchase requisition are missing.' });
+      return res.status(400).json({ message: 'Required fields are missing.' });
     }
 
     // Validate required fields for PRItem
-    if (!item_type || !description || !quantity || !unit || !estimated_price || !total_price) {
-      return res.status(400).json({ message: 'Required fields for PR item are missing.' });
+    if (!item_type || !description || !quantity || !unit || !estimated_price) {
+      return res.status(400).json({ message: 'Required item fields are missing.' });
     }
+
+    // Calculate total_amount dynamically
+    const total_amount = quantity * estimated_price;
 
     // Check if PR number already exists
     const existingPR = await PurchaseRequisition.findOne({ pr_number });
     if (existingPR) {
       return res.status(400).json({ message: 'PR number already exists.' });
     }
-
-    // Set total_amount equal to total_price
-    const total_amount = total_price;
 
     // Create a new purchase requisition
     const newPR = new PurchaseRequisition({
@@ -62,7 +61,7 @@ export const createPurchaseRequisition = async (req, res) => {
       quantity,
       unit,
       estimated_price,
-      total_price,
+      total_price: total_amount,
       notes,
     });
 
