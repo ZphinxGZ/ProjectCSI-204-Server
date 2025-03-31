@@ -11,6 +11,7 @@ const accountsPayableSchema = new mongoose.Schema({
   remaining_amount: { type: Number }, // จำนวนเงินที่เหลืออยู่
   status: { type: String, enum: ['Pending', 'Partial', 'Paid'], default: 'Pending' }, // สถานะการชำระเงิน
   notes: { type: String }, // หมายเหตุเพิ่มเติม
+  attachments: [{ type: String }], // Paths to uploaded attachments
   created_at: { type: Date, default: Date.now } // วันที่และเวลาที่สร้างข้อมูล
 });
 
