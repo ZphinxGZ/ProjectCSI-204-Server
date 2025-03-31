@@ -1,6 +1,8 @@
 import PurchaseOrder from '../models/PurchaseOrder.js';
 import Vendor from '../models/Vendor.js';
 import PurchaseRequisition from '../models/PurchaseRequisition.js';
+import POItem from '../models/POItem.js';
+import PRItem from '../models/PRItem.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -42,6 +44,12 @@ export const createPurchaseOrder = async (req, res) => {
       return res.status(404).json({ message: 'Purchase requisition not found.' });
     }
 
+    // Fetch PRItems linked to the purchase requisition
+    const prItems = await PRItem.find({ pr_id });
+    if (!prItems.length) {
+      return res.status(404).json({ message: 'No items found for the given purchase requisition.' });
+    }
+
     // Create a new purchase order
     const newPO = await PurchaseOrder.create({
       po_number,
@@ -57,7 +65,24 @@ export const createPurchaseOrder = async (req, res) => {
       notes,
     });
 
-    res.status(201).json({ message: 'Purchase order created successfully.', purchaseOrder: newPO });
+    // Map PRItems to POItems
+    const poItems = prItems.map(prItem => ({
+      po_id: newPO._id,
+      pr_item_id: prItem._id,
+      description: prItem.description,
+      quantity: prItem.quantity,
+      unit: prItem.unit,
+      unit_price: prItem.estimated_price,
+      total_price: prItem.total_price,
+    }));
+
+    await POItem.insertMany(poItems);
+
+    res.status(201).json({
+      message: 'Purchase order and items created successfully.',
+      purchaseOrder: newPO,
+      poItems,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error.', error: error.message });
   }
