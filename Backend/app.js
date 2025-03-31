@@ -8,6 +8,7 @@ import purchaseRequisitionRoutes from './routes/purchaseRequisitionRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
 import purchaseOrderRoutes from './routes/purchaseOrderRoutes.js';
 import assetReceivingRoutes from './routes/assetReceivingRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api', purchaseRequisitionRoutes);
 app.use('/api', vendorRoutes);
 app.use('/api', purchaseOrderRoutes);
 app.use('/api', assetReceivingRoutes);
+app.use('/api', inventoryRoutes);
 
 // Start the server
 const PORT = 3001;

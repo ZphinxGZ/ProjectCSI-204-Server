@@ -1,5 +1,6 @@
 import FixedAsset from '../models/AssetReceipt.js';
 import POItem from '../models/POItem.js';
+import Inventory from '../models/InventoryItem.js'; // Import Inventory model
 
 export const receiveAsset = async (req, res) => {
   try {
@@ -35,6 +36,18 @@ export const receiveAsset = async (req, res) => {
       useful_life,
       location,
       registered_by: req.user._id,
+    });
+
+    // Add the asset to the inventory
+    await Inventory.create({
+      item_code: asset_code,
+      name,
+      category,
+      unit: 'Unit', // Default unit, adjust as needed
+      current_quantity: 1, // Since it's an asset, quantity is 1
+      unit_cost: cost,
+      total_value: cost,
+      supplier_id: po_id, // Assuming supplier is linked to the PO
     });
 
     res.status(201).json({ message: 'Asset received successfully.', asset: newAsset });
@@ -92,6 +105,17 @@ export const registerAsset = async (req, res) => {
       useful_life,
       location,
       registered_by: req.user._id,
+    });
+
+    // Add the asset to the inventory
+    await Inventory.create({
+      item_code: asset_code,
+      name,
+      category,
+      unit: 'Unit', // Default unit, adjust as needed
+      current_quantity: 1, // Since it's an asset, quantity is 1
+      unit_cost: cost,
+      total_value: cost,
     });
 
     res.status(201).json({ message: 'Asset registered successfully.', asset: newAsset });

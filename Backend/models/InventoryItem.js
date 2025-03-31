@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const inventorySchema = new mongoose.Schema({
-  item_code: { type: String, required: true, unique: true }, // รหัสสินค้า
+  item_code: { type: String, required: true, unique: true }, // Asset code or inventory code
   name: { type: String, required: true }, // ชื่อสินค้า
   category: { type: String }, // หมวดหมู่สินค้า
   unit: { type: String, required: true }, // หน่วยของสินค้า
