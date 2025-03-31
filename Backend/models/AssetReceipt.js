@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 
 const fixedAssetSchema = new mongoose.Schema({
   asset_code: { type: String, required: true, unique: true }, // รหัสทรัพย์สิน
-  po_id: { type: mongoose.Schema.Types.ObjectId, ref: 'PurchaseOrder', required: true }, // ใบสั่งซื้อที่เกี่ยวข้อง
-  po_item_id: { type: mongoose.Schema.Types.ObjectId, ref: 'POItem', required: true }, // รายการในใบสั่งซื้อที่เกี่ยวข้อง
+  po_id: { type: mongoose.Schema.Types.ObjectId, ref: 'PurchaseOrder' }, // ไม่จำเป็น
+  po_item_id: { type: mongoose.Schema.Types.ObjectId, ref: 'POItem' }, // ไม่จำเป็น
   name: { type: String, required: true }, // ชื่อทรัพย์สิน
   category: { type: String }, // หมวดหมู่ของทรัพย์สิน
   serial_number: { type: String }, // หมายเลขซีเรียลของทรัพย์สิน

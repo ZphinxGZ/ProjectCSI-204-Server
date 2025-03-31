@@ -96,7 +96,8 @@ export const getPurchaseOrderById = async (req, res) => {
     const purchaseOrder = await PurchaseOrder.findById(id)
       .populate('pr_id', 'pr_number department status') // Populate purchase requisition details
       .populate('vendor_id', 'vendor_name contact_person phone email') // Populate vendor details
-      .populate('issuer_id', 'full_name email'); // Populate issuer details
+      .populate('issuer_id', 'full_name email') // Populate issuer details
+      .populate('approved_by', 'full_name email'); // Populate approver details
 
     if (!purchaseOrder) {
       return res.status(404).json({ message: 'Purchase order not found.' });
